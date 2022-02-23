@@ -29,7 +29,7 @@ class DBEncryptionServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../config/config.php' => config_path('laravelDatabaseEncryption.php'),
+                __DIR__.'/../Config/config.php' => config_path('laravelDatabaseEncryption.php'),
             ], 'config');
 
             $this->commands([
@@ -46,7 +46,7 @@ class DBEncryptionServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'laravelDatabaseEncryption');
+        $this->mergeConfigFrom(__DIR__.'/../Config/config.php', 'laravelDatabaseEncryption');
     }
 
 
