@@ -1,41 +1,31 @@
 <?php
 /**
  * src/Encryption.php.
- *
  */
+
 namespace ESolution\DBEncryption;
 
 class Encrypter
 {
-
-    /**
-     * @param string $value
-     *
-     * @return string
-     */
-    public static function encrypt($value)
+    public static function encrypt($value): string
     {
-        return openssl_encrypt($value, config('laravelDatabaseEncryption.encrypt_method'), self::getKey(), 0, $iv = '');
+        $randomIv = self::randomIv();
+
+        return $randomIv . openssl_encrypt($value, config('laravelDatabaseEncryption.encrypt_method'), self::getKey(), 0, $iv = $randomIv);
     }
 
-    /**
-     * @param string $value
-     *
-     * @return string
-     */
-    public static function decrypt($value)
+    public static function decrypt($value): string
     {
-        return openssl_decrypt($value, config('laravelDatabaseEncryption.encrypt_method'), self::getKey(), 0, $iv = '');
+        return openssl_decrypt($value, config('laravelDatabaseEncryption.encrypt_method'), self::getKey(), 0, $iv = self::randomIv());
     }
 
-    /**
-     * Get app key for encryption key
-     *
-     * @return string
-     */
-    protected static function getKey()
+    public static function getKey(): string
     {
-        $salt = substr(hash('sha256', config('laravelDatabaseEncryption.encrypt_key')), 0, 16);
-        return $salt;
+        return substr(hash(config('laravelDatabaseEncryption.hash_method'), config('laravelDatabaseEncryption.encrypt_key')), 0, 16);
+    }
+
+    private static function randomIv(): string
+    {
+        return bin2hex(random_bytes(8));
     }
 }
