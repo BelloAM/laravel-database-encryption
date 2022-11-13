@@ -3,8 +3,9 @@
  * src/Commands/EncryptModel.php.
  *
  */
-namespace ESolution\DBEncryption\Console\Commands;
+namespace Hatcher\DBEncryption\Console\Commands;
 
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -33,8 +34,8 @@ class EncryptModel extends Command
     /**
      * Execute the console command.
      *
-     * @return mixed
-     * @throws \Exception
+     * @return void
+     * @throws Exception
      */
     public function handle()
     {
@@ -71,15 +72,18 @@ class EncryptModel extends Command
         $this->comment('Finished encryption');
     }
 
+    /**
+     * Get Encrypted Attributes.
+     * @param $record
+     * @return int[]
+     */
     private function getEncryptedAttributes($record)
     {
         $encryptedFields = ['encrypted' => 1];
 
         foreach ($this->attributes as $attribute) {
             $raw = $record->getOriginal($attribute);
-            // if (!str_contains($raw, $record->encrypter()->getPrefix())) {
-                $encryptedFields[$attribute] = $this->model->encryptAttribute($raw);
-            // }
+            $encryptedFields[$attribute] = $this->model->encryptAttribute($raw);
         }
         return $encryptedFields;
     }
@@ -87,6 +91,8 @@ class EncryptModel extends Command
     private function validateHasEncryptedColumn($model)
     {
         $table = $model->getTable();
+        $database = $model->getDatabaseName();
+        $table = preg_replace('/^'.$database.'\./', '', $table);
         if (! Schema::hasColumn($table, 'encrypted')) {
             $this->comment('Creating encrypted column');
             Schema::table($table, function (Blueprint $table) {
@@ -98,12 +104,12 @@ class EncryptModel extends Command
     /**
      * @param $class
      * @return Model
-     * @throws \Exception
+     * @throws Exception
      */
     public function guardClass($class)
     {
         if (!class_exists($class))
-            throw new \Exception("Class {$class} does not exists");
+            throw new Exception("Class {$class} does not exists");
         $model = new $class();
         $this->validateHasEncryptedColumn($model);
         return $model;

@@ -3,11 +3,11 @@
  * src/Providers/EncryptServiceProvider.php.
  */
 
-namespace ESolution\DBEncryption\Providers;
+namespace Hatcher\DBEncryption\Providers;
 
-use ESolution\DBEncryption\Console\Commands\DecryptModel;
-use ESolution\DBEncryption\Console\Commands\EncryptModel;
-use ESolution\DBEncryption\Encrypter;
+use Hatcher\DBEncryption\Console\Commands\DecryptModel;
+use Hatcher\DBEncryption\Console\Commands\EncryptModel;
+use Hatcher\DBEncryption\Encrypter;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
@@ -57,21 +57,17 @@ class DBEncryptionServiceProvider extends ServiceProvider
             // Initialize
             $salt = Encrypter::getKey();
 
-            $withFilter = count($parameters) > 3 ? true : false;
+            $withFilter = count($parameters) > 3;
 
-            $ignore_id = isset($parameters[2]) ? $parameters[2] : '';
+            $ignore_id = $parameters[2] ?? '';
 
             // Check using normal checker
             $data = DB::table($parameters[0])->whereRaw("CONVERT(AES_DECRYPT(FROM_BASE64(`{$parameters[1]}`), '{$salt}') USING utf8mb4) = '{$value}' ");
             $data = $ignore_id != '' ? $data->where('id', '!=', $ignore_id) : $data;
 
-            if ($withFilter) {
-                $data->where($parameters[3], $parameters[4]);
-            }
+            if ($withFilter) $data->where($parameters[3], $parameters[4]);
 
-            if ($data->first()) {
-                return false;
-            }
+            if ($data->first()) return false;
 
             return true;
         });
@@ -80,11 +76,11 @@ class DBEncryptionServiceProvider extends ServiceProvider
             // Initialize
             $salt = Encrypter::getKey();
 
-            $withFilter = count($parameters) > 3 ? true : false;
+            $withFilter = count($parameters) > 3;
             if (! $withFilter) {
-                $ignore_id = isset($parameters[2]) ? $parameters[2] : '';
+                $ignore_id = $parameters[2] ?? '';
             } else {
-                $ignore_id = isset($parameters[4]) ? $parameters[4] : '';
+                $ignore_id = $parameters[4] ?? '';
             }
 
             // Check using normal checker

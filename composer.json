@@ -1,24 +1,26 @@
 {
-  "name": "quevlu/laravel-database-encryption",
+  "name": "hatcher/laravel-database-encryption",
   "description": "Auto Encrypt and Decrypt Database through Eloquent",
   "type": "library",
   "license": "MIT",
   "authors": [
     {
-      "name": "quevlu",
-      "email": "info@elgibor-solution.com"
+      "name": "Hatcher",
+      "email": "info@hatcher.com"
     }
   ],
-  "require": {},
+  "require": {
+    "ext-openssl": "*"
+  },
   "autoload": {
     "psr-4": {
-      "ESolution\\DBEncryption\\": "src"
+      "Hatcher\\DBEncryption\\": "src"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "ESolution\\DBEncryption\\Tests\\": "tests",
-      "ESolution\\DBEncryption\\Tests\\Database\\Factories\\": "tests/database/factories"
+      "Hatcher\\DBEncryption\\Tests\\": "tests",
+      "Hatcher\\DBEncryption\\Tests\\Database\\Factories\\": "tests/database/factories"
     }
   },
   "require-dev": {
@@ -28,7 +30,7 @@
   "extra": {
     "laravel": {
       "providers": [
-        "ESolution\\DBEncryption\\Providers\\DBEncryptionServiceProvider"
+        "Hatcher\\DBEncryption\\Providers\\DBEncryptionServiceProvider"
       ]
     }
   },

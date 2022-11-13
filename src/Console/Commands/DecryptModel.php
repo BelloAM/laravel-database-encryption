@@ -3,8 +3,9 @@
  * src/Commands/DecryptModel.php.
  *
  */
-namespace ESolution\DBEncryption\Console\Commands;
+namespace Hatcher\DBEncryption\Console\Commands;
 
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -33,8 +34,8 @@ class DecryptModel extends Command
     /**
      * Execute the console command.
      *
-     * @return mixed
-     * @throws \Exception
+     * @return void
+     * @throws Exception
      */
     public function handle()
     {
@@ -52,17 +53,17 @@ class DecryptModel extends Command
             $bar->setFormat('%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
 
             $records =  $this->model->orderBy($pk_id, 'asc')->where('encrypted', 1)
-            ->chunkById(100, function($records) use($table, $bar, $pk_id) {
-                foreach ($records as $record) {
-                    $record->timestamps = false;
-                    $attributes = $this->getDecryptedAttributes($record);
-                    $update_id =  "{$record->{$pk_id}}";
-                    DB::table($table)->where($pk_id, $update_id)->update($attributes);
-                    $bar->advance();
-                    $record = null;
-                    $attributes = null;
-                }
-            });
+                ->chunkById(100, function($records) use($table, $bar, $pk_id) {
+                    foreach ($records as $record) {
+                        $record->timestamps = false;
+                        $attributes = $this->getDecryptedAttributes($record);
+                        $update_id =  "{$record->{$pk_id}}";
+                        DB::table($table)->where($pk_id, $update_id)->update($attributes);
+                        $bar->advance();
+                        $record = null;
+                        $attributes = null;
+                    }
+                });
             
             $bar->finish();
 
@@ -71,24 +72,32 @@ class DecryptModel extends Command
         $this->comment('Finished Model Decryption');
     }
 
+    /**
+     * Get Decrypted Attributes.
+     * @param $record
+     * @return int[]
+     */
     private function getDecryptedAttributes($record)
     {
         $encryptedFields = ['encrypted' => 0 ];
 
         foreach ($this->attributes as $attribute) {
             $raw = $record->{$attribute};
-
-            // if (str_contains($raw, $record->encrypter()->getPrefix())) {
-
-                $encryptedFields[$attribute] = $this->model->decryptAttribute($raw);
-            // }
+            $encryptedFields[$attribute] = $this->model->decryptAttribute($raw);
         }
         return $encryptedFields;
     }
 
+    /**
+     * Validate has encryptable column
+     * @param $model
+     * @return void
+     */
     private function validateHasEncryptedColumn($model)
     {
         $table = $model->getTable();
+        $database = $model->getDatabaseName();
+        $table = preg_replace('/^' . preg_quote($database . '.', '/') . '/', '', $table);
         if (! Schema::hasColumn($table, 'encrypted')) {
             $this->comment('Creating encrypted column');
             Schema::table($table, function (Blueprint $table) {
@@ -100,12 +109,12 @@ class DecryptModel extends Command
     /**
      * @param $class
      * @return Model
-     * @throws \Exception
+     * @throws Exception
      */
     public function guardClass($class)
     {
         if (!class_exists($class))
-            throw new \Exception("Class {$class} does not exists");
+            throw new Exception("Class {$class} does not exists");
         $model = new $class();
         $this->validateHasEncryptedColumn($model);
         return $model;

@@ -58,7 +58,7 @@ For example:
 
 ```php
     
-    use ESolution\DBEncryption\Traits\EncryptedAttribute;
+    use Hatcher\DBEncryption\Traits\EncryptedAttribute;
 
     class User extends Eloquent {
         use EncryptedAttribute;

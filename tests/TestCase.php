@@ -1,8 +1,8 @@
 <?php
 
-namespace ESolution\DBEncryption\Tests;
+namespace Hatcher\DBEncryption\Tests;
 
-use ESolution\DBEncryption\Providers\DBEncryptionServiceProvider;
+use Hatcher\DBEncryption\Providers\DBEncryptionServiceProvider;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {

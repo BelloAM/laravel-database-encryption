@@ -1,10 +1,10 @@
 <?php
 
-namespace ESolution\DBEncryption\Tests;
+namespace Hatcher\DBEncryption\Tests;
 
 use Illuminate\Database\Eloquent\Model;
-use ESolution\DBEncryption\Traits\EncryptedAttribute;
-use ESolution\DBEncryption\Tests\Database\Factories\TestUserFactory;
+use Hatcher\DBEncryption\Traits\EncryptedAttribute;
+use Hatcher\DBEncryption\Tests\Database\Factories\TestUserFactory;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
